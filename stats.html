@@ -52,7 +52,7 @@
 
   async function getCount(key) {
     try {
-      const res = await fetch(`https://api.countapi.xyz/get/${NAMESPACE}/${key}`);
+      const res = await fetch(`https://abacus.jasoncameron.dev/get/${NAMESPACE}/${key}`);
       const data = await res.json();
       return data.value ?? 0;
     } catch {
