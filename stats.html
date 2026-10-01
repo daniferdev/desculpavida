@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estatísticas - Desculpa Site</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #1b1b1f;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  h1 { font-size: 20px; margin-bottom: 30px; }
+  .cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .card {
+    background: #26262e;
+    border-radius: 14px;
+    padding: 24px 32px;
+    text-align: center;
+    min-width: 140px;
+  }
+  .card .num { font-size: 36px; font-weight: 700; color: #ff6b9d; }
+  .card .label { font-size: 13px; color: #aaa; margin-top: 6px; }
+  button {
+    margin-top: 30px;
+    background: #ff6b9d;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <h1>Estatísticas (só números agregados, sem identificar visitantes)</h1>
+  <div class="cards">
+    <div class="card"><div class="num" id="views">–</div><div class="label">Visualizações</div></div>
+    <div class="card"><div class="num" id="dodge">–</div><div class="label">Tentativas no "Não"</div></div>
+    <div class="card"><div class="num" id="yes">–</div><div class="label">Cliques em "Sim"</div></div>
+  </div>
+  <button onclick="load()">Atualizar</button>
+
+<script>
+  const NAMESPACE = "daniferdev-desculpa-site";
+
+  async function getCount(key) {
+    try {
+      const res = await fetch(`https://api.countapi.xyz/get/${NAMESPACE}/${key}`);
+      const data = await res.json();
+      return data.value ?? 0;
+    } catch {
+      return "?";
+    }
+  }
+
+  async function load() {
+    document.getElementById("views").textContent = await getCount("views");
+    document.getElementById("dodge").textContent = await getCount("dodge");
+    document.getElementById("yes").textContent = await getCount("yes");
+  }
+
+  load();
+</script>
+</body>
+</html>

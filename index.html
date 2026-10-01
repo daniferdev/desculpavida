@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desculpa :)</title>
+<style>
+  :root {
+    --pink: #ff6b9d;
+    --pink-dark: #e85387;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #ffb8d9);
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 {
+    color: #c23b6a;
+    font-size: clamp(22px, 5vw, 38px);
+    margin-bottom: 10px;
+    max-width: 90vw;
+  }
+  p.subtitle {
+    color: #a3315a;
+    font-size: clamp(14px, 3vw, 18px);
+    margin-bottom: 40px;
+  }
+  .buttons {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    border: none;
+    border-radius: 50px;
+    padding: 16px 36px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  #yesBtn, .yesClone {
+    background: var(--pink);
+    color: white;
+    box-shadow: 0 4px 15px rgba(232, 83, 135, 0.4);
+  }
+  #yesBtn:hover, .yesClone:hover {
+    transform: scale(1.08);
+    background: var(--pink-dark);
+  }
+  #noBtn {
+    background: #eee;
+    color: #888;
+    position: relative;
+  }
+  #noBtn.escaping {
+    position: fixed;
+  }
+  #finalMessage {
+    display: none;
+    margin-top: 30px;
+    color: #c23b6a;
+    font-size: clamp(16px, 4vw, 22px);
+    max-width: 90vw;
+  }
+  .emoji {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  #counterNote {
+    position: fixed;
+    bottom: 8px;
+    right: 10px;
+    font-size: 10px;
+    color: #c2799977;
+  }
+</style>
+</head>
+<body>
+
+  <div class="emoji" id="mainEmoji">🥺</div>
+  <h1 id="mainTitle">Desculpa, meu amor...</h1>
+  <p class="subtitle" id="subtitle">Eu sei que errei. Você me perdoa?</p>
+
+  <div class="buttons" id="buttonArea">
+    <button id="yesBtn">Sim 💖</button>
+    <button id="noBtn">Não</button>
+  </div>
+
+  <div id="finalMessage">
+    <div class="emoji">🥰❤️</div>
+    <p>Eu sabia que você ia me perdoar! Te amo muito, obrigado por ser incrível comigo.</p>
+  </div>
+
+  <div id="counterNote"></div>
+
+<script>
+  // ---- Contador agregado (sem identificar pessoas) via CountAPI ----
+  const NAMESPACE = "daniferdev-desculpa-site";
+
+  function hit(key) {
+    fetch(`https://api.countapi.xyz/hit/${NAMESPACE}/${key}`).catch(() => {});
+  }
+
+  // Conta visualização da página
+  hit("views");
+
+  // ---- Lógica do botão "Não" fugindo ----
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const buttonArea = document.getElementById("buttonArea");
+  const finalMessage = document.getElementById("finalMessage");
+  const mainTitle = document.getElementById("mainTitle");
+  const subtitle = document.getElementById("subtitle");
+  const mainEmoji = document.getElementById("mainEmoji");
+
+  let dodgeCount = 0;
+  const maxDodges = 5;
+
+  function moveNoButton() {
+    noBtn.classList.add("escaping");
+    const margin = 60;
+    const maxX = window.innerWidth - margin * 2;
+    const maxY = window.innerHeight - margin * 2;
+    const x = margin + Math.random() * maxX;
+    const y = margin + Math.random() * maxY;
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+  }
+
+  function dodge() {
+    dodgeCount++;
+    hit("dodge"); // conta tentativa de clicar em "não"
+    moveNoButton();
+
+    if (dodgeCount >= maxDodges) {
+      turnIntoTwoYes();
+    }
+  }
+
+  // Foge ao passar o mouse perto (desktop) e ao tentar clicar (mobile)
+  noBtn.addEventListener("mouseenter", dodge);
+  noBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    dodge();
+  });
+  noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    dodge();
+  });
+
+  function turnIntoTwoYes() {
+    noBtn.remove();
+    const yesClone = document.createElement("button");
+    yesClone.textContent = "Sim 💕";
+    yesClone.className = "yesClone";
+    yesClone.addEventListener("click", acceptApology);
+    buttonArea.appendChild(yesClone);
+
+    mainTitle.textContent = "Só tem uma resposta certa agora 😏";
+    subtitle.textContent = "";
+  }
+
+  function acceptApology(e) {
+    e.target.closest("body"); // no-op, mantém escopo
+    hit("yes"); // conta aceite (agregado, não identifica quem clicou)
+    buttonArea.style.display = "none";
+    mainTitle.style.display = "none";
+    subtitle.style.display = "none";
+    mainEmoji.textContent = "🥰";
+    finalMessage.style.display = "block";
+  }
+
+  yesBtn.addEventListener("click", acceptApology);
+</script>
+
+</body>
+</html>
